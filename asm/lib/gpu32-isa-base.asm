@@ -162,6 +162,13 @@
     4x8  => 0b10`2
 }
 
+#subruledef be2_mask {
+    00 => 0b00`2
+    01 => 0b01`2
+    10 => 0b10`2
+    11 => 0b11`2
+}
+
 #subruledef special_registers {
     ; TODO: Alignment is probably off? DW alignment?
     ; TODO: Missing TID, NTID, BID, NBID
@@ -297,12 +304,14 @@
     ; TODO: Remaining instructions: FMA, LEA
 
     ; LLI  - alu_func3 = 3
-    {p: pred} LLI {rd: reg}, {imm: imm16} => 0x1C`8 @ p       @ rd @ imm
-              LLI {rd: reg}, {imm: imm16} => asm { @true LLI {rd}, {imm} }
+    {p: pred} LLI.{m: be2_mask} {rd: reg}, {imm: imm16} => 0b001000`6 @ m @ p       @ rd @ imm
+              LLI.{m: be2_mask} {rd: reg}, {imm: imm16} => asm { @true LLI.{m} {rd}, {imm} }
+    {p: pred} LLI               {rd: reg}, {imm: imm16} => asm { {p} LLI.11 {rd}, {imm} }
 
     ; LUI  - alu_func3 = 3
-    {p: pred} LUI {rd: reg}, {imm: imm16} => 0x1D`8 @ p       @ rd @ imm
-              LUI {rd: reg}, {imm: imm16} => asm { @true LUI {rd}, {imm} }
+    {p: pred} LUI.{m: be2_mask} {rd: reg}, {imm: imm16} => 0b001001`6 @ m @ p       @ rd @ imm
+              LUI.{m: be2_mask} {rd: reg}, {imm: imm16} => asm { @true LUI.{m} {rd}, {imm} }
+    {p: pred} LUI               {rd: reg}, {imm: imm16} => asm { {p} LUI.11 {rd}, {imm} }
 
     ; ========================================================================
     ; IO - LOADS
@@ -325,7 +334,7 @@
               {m: mem_module}.ST                {rd: reg}, {rs1: reg}, {imm: imm11} => asm { @true {m}.ST.B4  {rd}, {rs1}, {imm} }
     {p: pred}              SR.ST                {rd: reg}, {rs1: reg}              => 0x9`4 @ 0b11`2 @ 0b00`2 @ p  @ rd @ rs1 @  0b0`11
                            SR.ST                {rd: reg}, {rs1: reg}              => asm { @true SR.ST  {rd}, {rs1} }
-    {p: pred}              SR.ST                {rd: reg}, {sr: special_registers} => 0x9`4 @ 0b11`2 @ 0b00`2 @ p  @ rd @ 0b0`5 @ imm
+    {p: pred}              SR.ST                {rd: reg}, {sr: special_registers} => 0x9`4 @ 0b11`2 @ 0b00`2 @ p  @ rd @ 0b0`5 @ sr
                            SR.ST                {rd: reg}, {sr: special_registers} => asm { @true SR.ST  {rd}, {sr} }
 
     ; TODO: Syntactic surgar to set rs1 to r0 if module is SR. Also add special names for e.g. TID.X, ..

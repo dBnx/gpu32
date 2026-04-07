@@ -27,12 +27,13 @@ test_alui_add:
 test_alui_:
 
 test_lli:
-    LLI r0, 0
+    LLI.11 r0, 0
+    LLI.10 r0, 0
     @p1 LLI r1, 0x1234
     
 test_lui:
-    LUI r0, 0
-    @p1 LUI r1, 0x1234
+    LUI.01 r0, 0
+    @p1 LUI.11 r1, 0x1234
 
 test_io:
 test_io_ld:
@@ -50,8 +51,12 @@ test_io_st:
 test_io_other:
     LDS.LD r0, r0 , 0
     LDS.ST r0, r0 , 0
-    SR.ST r0, r0 , 0
-    SR.ST r0, r0 , -1
+    SR.ST  r1, r0
+    @p1 SR.ST  r0, lane
+    SR.ST  r0, rdtsc
+    SR.LD  r1, r0
+    @p1 SR.LD  r0, rdtsc
+    SR.LD  r1, arg0
 
 test_system:
 test_system_jp:
@@ -64,9 +69,9 @@ test_system_:
     NOP 0
     @p1 NOP 0
     NOP 1
-    NOP -1
+    NOP 0b111_1111_1111_1111
 
     HALT 0
     @p1 HALT 0
     HALT 1
-    HALT -1
+    HALT 0b111_1111_1111_1111
