@@ -15,6 +15,10 @@ reset:
     ; SR.LD r30, a2 ; Fill data
     ; \-> SR.LD r30, r0, ?
 
+    ; r2: - Predicate for if lane is 0
+    SR.LD r2, lane_id
+    SEQ   r2, r2, r0
+
     ADDI r31, r0, 0        ; Setup start pointer
     LI   r31, {start}      ; 
 
@@ -28,6 +32,7 @@ reset:
 .clear_loop:
     ADDI r31, r31, 1           ; Increment 
     SEQ  r3,  r29, r31         ; Set if done 
+    AND  r3,  r3,  r2          ; Only set predicate if lane0
     @p3 GLOBAL.ST r29, r31, 0  ; Not yet -> Store
     @p3 JP.ABS .clear_loop     ; Not yet -> Loop
 .end:

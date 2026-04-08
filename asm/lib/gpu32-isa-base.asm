@@ -259,6 +259,13 @@
     {p: pred} SLT                {rd: reg}, {rs1: reg}, {rs2: reg} => asm { {p}   SLT.1x32 {rd}, {rs1}, {rs2}}
               SLT                {rd: reg}, {rs1: reg}, {rs2: reg} => asm { @true SLT.1x32 {rd}, {rs1}, {rs2}} 
 
+    ; SLT - alu_func4 = 2 - alu_func3 = 6
+    {p: pred} SLE.{m: simd_mode} {rd: reg}, {rs1: reg}, {rs2: reg} => 0x00`5 @ 0x6`3 @ p`3     @ rd @ rs1 @ rs2 @ 0x2`4 @ m
+              SLE.{m: simd_mode} {rd: reg}, {rs1: reg}, {rs2: reg} => asm { @true SLE.{m}  {rd}, {rs1}, {rs2}}
+    {p: pred} SLE                {rd: reg}, {rs1: reg}, {rs2: reg} => asm { {p}   SLE.1x32 {rd}, {rs1}, {rs2}}
+              SLE                {rd: reg}, {rs1: reg}, {rs2: reg} => asm { @true SLE.1x32 {rd}, {rs1}, {rs2}} 
+
+    
     ; TODO: Remaining instructions
 
     ; ========================================================================

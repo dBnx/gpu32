@@ -15,9 +15,27 @@
                                                }
               SWAP {ra: reg}, {rb: reg} => asm { @true SWAP {ra}, {rb} }
 
-    ; Set if equal zero
+    {p: pred} INV                {rd: reg}, {rs1: reg} => asm { {p}   XORI.1x32 {rd}, {rs1}, -1}
+              INV                {rd: reg}, {rs1: reg} => asm { @true INV       {rd}, {rs1}} 
+
+    ; Set Equal Zero
     {p: pred} SEZ                {rd: reg}, {rs1: reg} => asm { {p}   SEQ.1x32 {rd}, {rs1}, r0}
               SEZ                {rd: reg}, {rs1: reg} => asm { @true SEQ.1x32 {rd}, {rs1}, r0} 
+    ; Set Not Equal Zero
+    ; {p: pred} SNZ                {rd: reg}, {rs1: reg} => asm { {p}   SLT.1x32 {rd}, {rs1}, }
+    ;           SNZ                {rd: reg}, {rs1: reg} => asm { @true SLT.1x32 {rd}, {rs1}, } 
+
+    ; Set Greater Equal - Swap rs1 and rs2 in SLT for convinience
+    {p: pred} SGE.{m: simd_mode} {rd: reg}, {rs1: reg}, {rs2: reg} => asm { {p}   SLT.{m}  {rd}, {rs2}, {rs1}}
+              SGE.{m: simd_mode} {rd: reg}, {rs1: reg}, {rs2: reg} => asm { @true SLT.{m}  {rd}, {rs2}, {rs1}}
+    {p: pred} SGE                {rd: reg}, {rs1: reg}, {rs2: reg} => asm { {p}   SLT.1x32 {rd}, {rs2}, {rs1}}
+              SGE                {rd: reg}, {rs1: reg}, {rs2: reg} => asm { @true SLT.1x32 {rd}, {rs2}, {rs1}} 
+
+    ; Set Greater Than - Swap rs1 and rs2 in SLE for convinience
+    {p: pred} SGT.{m: simd_mode} {rd: reg}, {rs1: reg}, {rs2: reg} => asm { {p}   SLE.{m}  {rd}, {rs2}, {rs1}}
+              SGT.{m: simd_mode} {rd: reg}, {rs1: reg}, {rs2: reg} => asm { @true SLE.{m}  {rd}, {rs2}, {rs1}}
+    {p: pred} SGT                {rd: reg}, {rs1: reg}, {rs2: reg} => asm { {p}   SLE.1x32 {rd}, {rs2}, {rs1}}
+              SGT                {rd: reg}, {rs1: reg}, {rs2: reg} => asm { @true SLE.1x32 {rd}, {rs2}, {rs1}} 
 
     ; ========================================================================
     ; LOAD IMMEDIATE HELPERS
